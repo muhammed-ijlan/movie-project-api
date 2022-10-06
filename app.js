@@ -17,14 +17,12 @@ mongoose.connect("mongodb://localhost:27017/movieApp").then(() => {
   console.log(e);
 })
 
-
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use('/auth', authRouter);
-app.use('/users', usersRouter);
+app.use('/user', usersRouter);
 app.use("/movie", movieRouter)
 
 app.use(function (req, res, next) {
