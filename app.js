@@ -4,8 +4,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
 require("dotenv").config();
+
 var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
+const movieRouter = require("./routes/movie")
 
 var app = express();
 
@@ -23,6 +25,7 @@ app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use("/movie", movieRouter)
 
 app.use(function (req, res, next) {
   next(createError(404));
