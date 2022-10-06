@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const User = require("../models/User")
 const argon2 = require("argon2")
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const verify = require('../verifyToken');
 
 // REGISTER
 router.post('/register', async (req, res) => {
@@ -42,7 +43,18 @@ router.post("/signin", async (req, res) => {
     console.log(e);
     res.status(500).json({ message: e.message })
   }
-
 })
+
+// LOGOUT
+// router.get("/logout", verify, (req, res) => {
+//   try {
+//     console.log(req.token);
+//     req.token = "";
+//     req.user = null;
+//     res.status(200).json("logged out")
+//   } catch (e) {
+//     res.status(500).json(e.message)
+//   }
+// })
 
 module.exports = router;
