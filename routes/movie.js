@@ -6,7 +6,7 @@ const User = require("../models/User");
 // GET ALL
 router.get("/", async (req, res) => {
     try {
-        const limit = req.query.limit || 5;
+        const limit = req.query.limit || 8;
         const page = req.query.page - 1 || 0;
         const skip = limit * page
 
@@ -31,14 +31,14 @@ router.get("/:id", verify, async (req, res) => {
     }
 })
 
-// FAVOURITE A MOVIE
+// Like A MOVIE
 router.put("/like/:id", verify, async (req, res) => {
     try {
         await User.findByIdAndUpdate(req.user.id, {
-            $push: { movieList: req.params.id }
+            $addToSet: { movieList: req.params.id }
         })
-        res.status(201).json("Added to movie list")
 
+        res.status(201).json("Movie has been added to users Moivelist !")
     } catch (e) {
         console.log(e);
         res.status(500).json({ error: e.message })

@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
 require("dotenv").config();
+const cors = require("cors")
 
 var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
@@ -20,6 +21,7 @@ mongoose.connect("mongodb://localhost:27017/movieApp").then(() => {
 app.use(logger('dev'));
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors())
 
 app.use('/auth', authRouter);
 app.use('/user', usersRouter);

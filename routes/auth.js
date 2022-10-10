@@ -8,7 +8,7 @@ const verify = require('../verifyToken');
 // REGISTER
 router.post('/register', async (req, res) => {
   try {
-    const hash = await argon2.hash(req.body)
+    const hash = await argon2.hash(req.body.password)
     const newUser = new User({
       ...req.body,
       password: hash
@@ -27,9 +27,15 @@ router.post('/register', async (req, res) => {
 router.post("/signin", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email })
-    if (!user) res.status(401).json({ message: "User Not found !" })
+    if (!user) {
+      return res.status(401).json({ message: "User Not found !" })
+    }
 
-    if (await argon2.verify(user.password, req.body.password)) {
+
+    if (!req.body.password) {
+      res.status(401).json("Please enter password !")
+
+    } else if (await argon2.verify(user.password, req.body.password)) {
 
       const token = jwt.sign({
         id: user._id
