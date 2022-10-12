@@ -15,7 +15,6 @@ router.post('/register', async (req, res) => {
     }
 
     const userExist = await User.findOne({ email: email })
-
     if (userExist) {
       return res.status(403).json("Email already exists")
     }
@@ -38,22 +37,23 @@ router.post('/register', async (req, res) => {
 // SIGNIN
 router.post("/signin", async (req, res) => {
   try {
+    if (!req.body.email) {
+      return res.status(400).json("please fill the email field!")
+    }
+
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
       return res.status(401).json({ message: "User Not found !" })
     }
-
 
     if (!req.body.password) {
       res.status(401).json("Please enter password !")
 
     } else if (await argon2.verify(user.password, req.body.password)) {
 
-      const token = jwt.sign({
-        id: user._id
-      }, process.env.SECRET)
+      const token = await user.generateAuthToken();
 
-      res.status(200).json({ message: "Successfully SignedIn !", token, user })
+      res.cookie("jwtoken", token, { httpOnly: true }).status(200).json({ message: "Successfully SignedIn !", token, user })
     } else {
       res.status(401).json({ message: "Invalid Credentials!" })
     }
@@ -64,15 +64,23 @@ router.post("/signin", async (req, res) => {
 })
 
 // LOGOUT
-// router.get("/logout", verify, (req, res) => {
-//   try {
-//     console.log(req.token);
-//     req.token = "";
-//     req.user = null;
-//     res.status(200).json("logged out")
-//   } catch (e) {
-//     res.status(500).json(e.message)
-//   }
-// })
+router.get("/logout", verify, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.user._id })
+
+    // user.tokens = user.tokens.filter((currentElm) => {
+    //   return currentElm.token !== req.token;
+    // })
+    user.tokens = [];
+    console.log(user.tokens);
+
+    res.clearCookie("jwtoken");
+
+    await user.save();
+    res.status(200).json("logged out")
+  } catch (e) {
+    res.status(500).json(e.message)
+  }
+})
 
 module.exports = router;

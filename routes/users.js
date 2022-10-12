@@ -20,8 +20,9 @@ router.get('/:id', verify, async (req, res) => {
 // Get list of movies
 router.get("/movies/list", verify, async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user.id })
+    const user = await User.findOne({ _id: req.user._id })
     const favMovies = user.movieList;
+    console.log(favMovies);
 
     const list = await Promise.all(favMovies.map(movieId => {
       return Movie.findById(movieId)

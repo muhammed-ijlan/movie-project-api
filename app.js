@@ -18,10 +18,11 @@ mongoose.connect("mongodb://localhost:27017/movieApp").then(() => {
   console.log(e);
 })
 
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors())
+app.use(cors({ origin: true, credentials: true }))
 
 app.use('/auth', authRouter);
 app.use('/user', usersRouter);

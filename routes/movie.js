@@ -26,18 +26,18 @@ router.get("/:id", verify, async (req, res) => {
 
     try {
         const movie = await Movie.findById({ _id: req.params.id })
-        if (!movie) res.status(401).json("No movie found!")
+        if (!movie) res.status(401).json({ message: "movie not found" })
         res.status(200).json(movie)
 
     } catch (e) {
-        res.status(500).json(e)
+        res.status(500).json({ error: e.message })
     }
 })
 
 // Like A MOVIE
 router.put("/like/:id", verify, async (req, res) => {
     try {
-        await User.findByIdAndUpdate(req.user.id, {
+        await User.findByIdAndUpdate(req.user._id, {
             $addToSet: { movieList: req.params.id }
         })
         res.status(200).json({ success: true, message: "Movie has been added to your movie list" })
@@ -51,7 +51,7 @@ router.put("/like/:id", verify, async (req, res) => {
 
 router.put("/dislike/:id", verify, async (req, res) => {
     try {
-        await User.findByIdAndUpdate(req.user.id, {
+        await User.findByIdAndUpdate(req.user._id, {
             $pull: { movieList: req.params.id }
         })
         res.status(200).json("movie successfully removed from movie list")
