@@ -26,11 +26,7 @@ router.get("/movies/list", verify, async (req, res) => {
     const list = await Promise.all(favMovies.map(movieId => {
       return Movie.findById(movieId)
     }))
-    console.log(list);
-
     res.status(200).json(list.flat())
-
-
 
   } catch (e) {
     console.log(e);

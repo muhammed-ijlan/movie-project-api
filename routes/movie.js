@@ -6,12 +6,15 @@ const User = require("../models/User");
 // GET ALL
 router.get("/", async (req, res) => {
     try {
-        const limit = req.query.limit || 8;
-        const page = req.query.page - 1 || 0;
+        const limit = parseInt(req.query.limit) || 8;
+        const page = parseInt(req.query.page) - 1 || 0;
         const skip = limit * page
+        const search = req.query.search || "";
 
-        const movie = await Movie.find().limit(limit).skip(skip)
-        res.status(200).json({ limit, skip, movie })
+        const movie = await Movie.find({ movieName: { $regex: search, $options: "i" } }).limit(limit).skip(skip)
+        const total = await Movie.find().countDocuments().exec();
+
+        res.status(200).json({ total, limit, skip, movie })
     } catch (e) {
         console.log(e);
         res.status(500).json(e)
@@ -37,11 +40,23 @@ router.put("/like/:id", verify, async (req, res) => {
         await User.findByIdAndUpdate(req.user.id, {
             $addToSet: { movieList: req.params.id }
         })
+        res.status(200).json({ success: true, message: "Movie has been added to your movie list" })
 
-        res.status(201).json("Movie has been added to users Moivelist !")
+
     } catch (e) {
         console.log(e);
         res.status(500).json({ error: e.message })
+    }
+})
+
+router.put("/dislike/:id", verify, async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.user.id, {
+            $pull: { movieList: req.params.id }
+        })
+        res.status(200).json("movie successfully removed from movie list")
+    } catch (er) {
+        console.log(er);
     }
 })
 

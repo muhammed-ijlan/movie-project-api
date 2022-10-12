@@ -8,6 +8,18 @@ const verify = require('../verifyToken');
 // REGISTER
 router.post('/register', async (req, res) => {
   try {
+    const { email, password, fullname } = req.body;
+
+    if (!email || !password || !fullname) {
+      return res.status(422).json("Please fill the provided fields!")
+    }
+
+    const userExist = await User.findOne({ email: email })
+
+    if (userExist) {
+      return res.status(403).json("Email already exists")
+    }
+
     const hash = await argon2.hash(req.body.password)
     const newUser = new User({
       ...req.body,
