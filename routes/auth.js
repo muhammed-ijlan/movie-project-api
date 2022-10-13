@@ -11,7 +11,7 @@ router.post('/register', async (req, res) => {
     const { email, password, fullname } = req.body;
 
     if (!email || !password || !fullname) {
-      return res.status(422).json("Please fill the provided fields!")
+      return res.status(403).json("Please fill the provided fields!")
     }
 
     const userExist = await User.findOne({ email: email })
@@ -37,17 +37,17 @@ router.post('/register', async (req, res) => {
 // SIGNIN
 router.post("/signin", async (req, res) => {
   try {
-    if (!req.body.email) {
-      return res.status(400).json("please fill the email field!")
+    if (!req.body.email || !req.body.email.includes("@")) {
+      return res.status(400).json({ message: "please enter Valid email!" })
     }
 
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
-      return res.status(401).json({ message: "User Not found !" })
+      return res.status(403).json({ message: "User Not found !" })
     }
 
     if (!req.body.password) {
-      res.status(401).json("Please enter password !")
+      res.status(403).json({ message: "Please Valid enter password !" })
 
     } else if (await argon2.verify(user.password, req.body.password)) {
 
@@ -55,7 +55,7 @@ router.post("/signin", async (req, res) => {
 
       res.cookie("jwtoken", token, { httpOnly: true }).status(200).json({ message: "Successfully SignedIn !", token, user })
     } else {
-      res.status(401).json({ message: "Invalid Credentials!" })
+      res.status(40).json({ message: "Invalid Credentials!" })
     }
   } catch (e) {
     console.log(e);
@@ -71,6 +71,7 @@ router.get("/logout", verify, async (req, res) => {
     // user.tokens = user.tokens.filter((currentElm) => {
     //   return currentElm.token !== req.token;
     // })
+
     user.tokens = [];
     console.log(user.tokens);
 
