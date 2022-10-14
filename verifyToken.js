@@ -13,14 +13,14 @@ async function verify(req, res, next) {
         const verifyTokens = user.tokens.map(currentEl => {
             return currentEl.token === cookieToken
         })
-
+        console.log(verifyTokens);
         if (verifyTokens.includes(true)) {
             req.user = verifyUser;
             req.token = cookieToken;
 
             next();
         } else {
-            res.status(401).json("you are not authenticated!")
+            res.status(401).json("you are not authenticated! false")
         }
 
     } else {

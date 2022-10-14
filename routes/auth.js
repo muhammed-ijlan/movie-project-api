@@ -53,9 +53,9 @@ router.post("/signin", async (req, res) => {
 
       const token = await user.generateAuthToken();
 
-      res.cookie("jwtoken", token).status(200).json({ message: "Successfully SignedIn !", token, user })
+      res.cookie("jwtoken", token, { httpOnly: true }).status(200).json({ message: "Successfully SignedIn !", token, user })
     } else {
-      res.status(40).json({ message: "Invalid Credentials!" })
+      res.status(403).json({ message: "Invalid Credentials!" })
     }
   } catch (e) {
     console.log(e);
