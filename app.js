@@ -12,7 +12,7 @@ const movieRouter = require("./routes/movie")
 
 var app = express();
 
-mongoose.connect("mongodb://localhost:27017/movieApp").then(() => {
+mongoose.connect(process.env.MONGO).then(() => {
   console.log("DB connected");
 }).catch((e) => {
   console.log(e);
