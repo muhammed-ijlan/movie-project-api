@@ -53,7 +53,7 @@ router.post("/signin", async (req, res) => {
 
       const token = await user.generateAuthToken();
 
-      res.cookie("jwtoken", token, { httpOnly: true }).status(200).json({ message: "Successfully SignedIn !", token, user })
+      res.cookie("accessToken", token, { httpOnly: true }).status(200).json({ message: "Successfully SignedIn !", token, user })
     } else {
       res.status(403).json({ message: "Invalid Credentials!" })
     }
@@ -74,7 +74,6 @@ router.get("/logout", verify, async (req, res) => {
 
     user.tokens = [];
     console.log(user.tokens);
-
     res.clearCookie("jwtoken");
 
     await user.save();
