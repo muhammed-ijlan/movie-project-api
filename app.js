@@ -5,6 +5,7 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 require("dotenv").config();
 const cors = require("cors")
+var path = require('path');
 
 var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.static(__dirname + '/public'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/auth', authRouter);
 app.use('/user', usersRouter);

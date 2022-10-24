@@ -2,7 +2,18 @@ const router = require("express").Router();
 const verify = require("../verifyToken")
 const Movie = require("../models/Movie");
 const User = require("../models/User");
-const excelJs = require("exceljs")
+const multer = require("multer")
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "./uploads")
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "-" + file.originalname)
+    }
+})
+
+const upload = multer({ storage: storage })
 
 // GET ALL
 router.get("/", async (req, res) => {
@@ -60,6 +71,21 @@ router.put("/dislike/:id", verify, async (req, res) => {
         res.status(200).json("movie successfully removed from movie list")
     } catch (er) {
         console.log(er);
+    }
+})
+
+// create Movie
+router.post("/create", upload.single("movie"), verify, async (req, res) => {
+    try {
+        const newMovie = new Movie({
+            movieName: req.body.movieName,
+            image: req.file.path,
+            desc: req.body.desc
+        })
+        await newMovie.save();
+        res.status(201).json({ message: "Movie has been created", movie: newMovie })
+    } catch (e) {
+        console.log(e);
     }
 })
 
