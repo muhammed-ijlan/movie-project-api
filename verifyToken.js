@@ -8,7 +8,8 @@ async function verify(req, res, next) {
     if (cookieToken) {
         const verifyUser = jwt.verify(cookieToken, process.env.SECRET)
 
-        const user = await User.findById(verifyUser._id)
+        const user = await User.findOne({ _id: verifyUser._id })
+        console.log(user);
 
         const verifyTokens = user.tokens.map(currentEl => {
             return currentEl.token === cookieToken

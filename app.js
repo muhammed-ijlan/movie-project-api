@@ -11,7 +11,7 @@ var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
 const movieRouter = require("./routes/movie")
 const exportRouter = require("./routes/export")
-
+const sampleRouter = require("./routes/sample")
 var app = express();
 
 mongoose.connect(process.env.MONGO).then(() => {
@@ -31,6 +31,7 @@ app.use('/auth', authRouter);
 app.use('/user', usersRouter);
 app.use("/movie", movieRouter)
 app.use("/export", exportRouter)
+// app.use("/sample", sampleRouter)
 
 // app.use(function (req, res, next) {
 //   next(createError(404));

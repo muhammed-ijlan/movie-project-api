@@ -16,20 +16,46 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 // GET ALL
+// router.get("/", async (req, res) => {
+//     try {
+//         const limit = parseInt(req.query.limit) || 8;
+//         const page = parseInt(req.query.page) - 1 || 0;
+//         const skip = limit * page
+//         const search = req.query.search || "";
+
+//         const movie = await Movie.find({ movieName: { $regex: search, $options: "i" } }).limit(limit).skip(skip)
+//         const total = await Movie.find().countDocuments().exec();
+
+//         res.status(200).json({ total, limit, skip, movie })
+//     } catch (e) {
+//         console.log(e);
+//         res.status(500).json(e)
+//     }
+// })
+
+// TODO: GET ALL
+
 router.get("/", async (req, res) => {
+    const limit = parseInt(req.query.limit) || 8;
+    const page = parseInt(req.query.page) - 1 || 0;
+    const skip = limit * page
+    const search = req.query.search || "";
     try {
-        const limit = parseInt(req.query.limit) || 8;
-        const page = parseInt(req.query.page) - 1 || 0;
-        const skip = limit * page
-        const search = req.query.search || "";
+        const total = await Movie.countDocuments().exec();
+        console.log(total);
 
-        const movie = await Movie.find({ movieName: { $regex: search, $options: "i" } }).limit(limit).skip(skip)
-        const total = await Movie.find().countDocuments().exec();
+        const movies = await Movie.aggregate([
+            { $match: { "movieName": { $regex: search, $options: "i" } } },
+            { $skip: skip },
+            { $limit: limit },
+        ])
 
-        res.status(200).json({ total, limit, skip, movie })
+        if (!movies) res.status(404).json("no movie found")
+
+        res.status(200).json({ total, limit, skip, movies })
     } catch (e) {
         console.log(e);
-        res.status(500).json(e)
+        res.status(500).json(e.message)
     }
 })
 
@@ -38,7 +64,8 @@ router.get("/:id", verify, async (req, res) => {
 
     try {
         const movie = await Movie.findById({ _id: req.params.id })
-        if (!movie) res.status(401).json({ message: "movie not found" })
+        console.log(movie);
+        if (!movie) res.status(404).json({ message: "movie not found" })
         res.status(200).json(movie)
 
     } catch (e) {
