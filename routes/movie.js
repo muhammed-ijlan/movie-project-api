@@ -41,18 +41,26 @@ router.get("/", async (req, res) => {
     const skip = limit * page
     const search = req.query.search || "";
     try {
-        const total = await Movie.countDocuments().exec();
-        console.log(total);
 
         const movies = await Movie.aggregate([
-            { $match: { "movieName": { $regex: search, $options: "i" } } },
-            { $skip: skip },
-            { $limit: limit },
+            {
+                $facet: {
+                    "docs": [
+                        { $match: { "movieName": { $regex: search, $options: "i" } } },
+                        { $skip: skip },
+                        { $limit: limit }
+                    ],
+                    "totalCount": [
+                        { $count: "count" }
+                    ]
+                }
+            }
+
         ])
 
         if (!movies) res.status(404).json("no movie found")
 
-        res.status(200).json({ total, limit, skip, movies })
+        res.status(200).json({ limit, skip, movies })
     } catch (e) {
         console.log(e);
         res.status(500).json(e.message)
